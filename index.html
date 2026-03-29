@@ -13,10 +13,10 @@
 }
 
 body {
-    height: 100vh;
+    min-height: 100vh;
     font-family: 'Arial', sans-serif;
     color: white;
-    overflow: hidden;
+    overflow-y: auto;
     background: radial-gradient(circle at center, #080c20, #000);
 }
 
@@ -89,8 +89,8 @@ body::after {
 
 /* 플레이어 */
 .player {
-    width: 200px;
-    height: 200px;
+    width: min(200px, 50vw);
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     border: 2px solid #F0E68C;
     display: flex;
