@@ -48,7 +48,16 @@ body::after {
         rgba(240,230,140,0.08),
         transparent 70%
     );
-    animation: aurora2 30s ease-in-out infinite alternate;
+    animation: aurora2 30s ease-in-out infinite alternate,
+               lightningFlash 7s infinite;
+}
+
+/* 번개 효과 */
+@keyframes lightningFlash {
+    0%, 92%, 100% { opacity: 0; }
+    94% { opacity: 0.4; }
+    96% { opacity: 0.1; }
+    98% { opacity: 0.5; }
 }
 
 @keyframes aurora1 {
@@ -118,18 +127,18 @@ body::after {
     opacity: 0.5;
 }
 
-/* ⭐⭐⭐ 개선된 컨트롤 ⭐⭐⭐ */
+/* 컨트롤 */
 .controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 18px;              /* 간격 증가 */
-    padding: 10px 20px;     /* 여유 공간 */
-    min-width: 320px;       /* 가로 확장 */
+    gap: 18px;
+    padding: 10px 20px;
+    min-width: 320px;
 }
 
 .controls button {
-    padding: 12px 18px;     /* 버튼 크기 증가 */
+    padding: 12px 18px;
     font-size: 16px;
     border: none;
     border-radius: 12px;
@@ -143,7 +152,22 @@ body::after {
 }
 
 .controls input {
-    width: 120px;           /* 볼륨 더 넓게 */
+    width: 120px;
+}
+
+/* ✅ 재생바 추가 */
+.progress-wrap {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+#progress {
+    flex: 1;
 }
 
 /* 트랙 */
@@ -212,7 +236,13 @@ body::after {
     <span>🎧 5 Tracks</span>
 </div>
 
-<!-- ⭐ 넓어진 컨트롤 -->
+<!-- 🎵 재생바 -->
+<div class="progress-wrap">
+    <span id="current-time">0:00</span>
+    <input type="range" id="progress" value="0" step="1">
+    <span id="duration">0:00</span>
+</div>
+
 <div class="controls">
     <button id="prev">⏮</button>
     <button id="play">▶</button>
@@ -272,6 +302,16 @@ const prevBtn = document.getElementById("prev");
 const nextBtn = document.getElementById("next");
 const volume = document.getElementById("volume");
 
+const progress = document.getElementById("progress");
+const currentTimeEl = document.getElementById("current-time");
+const durationEl = document.getElementById("duration");
+
+function formatTime(time) {
+    const min = Math.floor(time / 60);
+    const sec = Math.floor(time % 60);
+    return `${min}:${sec.toString().padStart(2, "0")}`;
+}
+
 function loadSong(index) {
     current = index;
     audio.src = songs[index].src;
@@ -318,6 +358,21 @@ prevBtn.addEventListener("click", () => {
 
 volume.addEventListener("input", () => {
     audio.volume = volume.value;
+});
+
+/* 🎵 재생바 기능 */
+audio.addEventListener("timeupdate", () => {
+    progress.value = audio.currentTime;
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+});
+
+audio.addEventListener("loadedmetadata", () => {
+    progress.max = audio.duration;
+    durationEl.textContent = formatTime(audio.duration);
+});
+
+progress.addEventListener("input", () => {
+    audio.currentTime = progress.value;
 });
 
 audio.addEventListener("ended", () => {
